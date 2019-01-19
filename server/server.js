@@ -2,6 +2,10 @@ const path = require('path');
 const express = require('express');
 const socketIO = require('socket.io');
 const http = require('http');
+const {generateMessage} = require('./utils/message');
+
+
+
 const publicPath = path.join(__dirname, './../public');
 
 const port = process.env.PORT || 3000;
@@ -22,15 +26,18 @@ io.on('connection', (socket) => {
 
     // });
 
+    
+
     // Socket on is one CONNECTION. 
     socket.on('createMessage', (message) => {
        console.log('createEmail', message);
        // IO.emit sends event to every connection...
-       io.emit('newMessage', {from: message.from, text: message.text, createAt: new Date().getTime()});
-    });
+        socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat up'));
 
-    socket.on('disconnect', () => {
-        console.log('User was disconnected')
+        socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
+    });
+        socket.on('disconnect', () => {
+        console.log('User was disconnected');
     });
 });
 
